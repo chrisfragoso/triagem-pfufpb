@@ -26,11 +26,14 @@ HIERARQUIA DE DECISÃO — aplique nesta ordem:
 
 Se dados insuficientes: destino="INFORMAÇÕES INSUFICIENTES", destino_cor="grey", cuidados=lista do que falta.`;
 
+const SENHA_CORRETA = process.env.SITE_PASSWORD || "pfufpb2025";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { texto } = req.body;
-  if (!texto?.trim()) return res.status(400).json({ error: "Texto obrigatório" });
+  const { texto, senha } = req.body;
+  if (!senha || senha !== SENHA_CORRETA) return res.status(401).json({ error: "Senha incorreta." });
+  if (!texto?.trim()) return res.status(400).json({ error: "Texto obrigatório." });
 
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
