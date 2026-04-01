@@ -9,6 +9,18 @@
   body { font-family: 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; padding: 2rem 1rem; }
   .wrap { max-width: 780px; margin: 0 auto; }
 
+  /* LOGIN */
+  .login-wrap { max-width: 380px; margin: 8vh auto 0; background: #fff; border: 0.5px solid #e5e5e5; border-radius: 16px; padding: 2rem; text-align: center; }
+  .login-badge { display: inline-flex; background: #E6F1FB; color: #0C447C; font-size: 12px; font-weight: 500; padding: 4px 14px; border-radius: 20px; margin-bottom: 16px; }
+  .login-title { font-size: 20px; font-weight: 500; margin-bottom: 6px; }
+  .login-sub { font-size: 13px; color: #888; margin-bottom: 24px; line-height: 1.5; }
+  .login-input { width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit; border: 0.5px solid #e5e5e5; border-radius: 8px; background: #fafafa; outline: none; margin-bottom: 10px; text-align: center; letter-spacing: 2px; }
+  .login-input:focus { border-color: #185FA5; }
+  .login-btn { width: 100%; padding: 11px; font-size: 14px; font-weight: 500; border-radius: 8px; border: none; background: #185FA5; color: #fff; cursor: pointer; }
+  .login-btn:hover { background: #1450a0; }
+  .login-erro { font-size: 13px; color: #A32D2D; background: #FCEBEB; border-radius: 8px; padding: 8px 12px; margin-top: 10px; display: none; }
+
+  /* APP */
   .header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 0.5px solid #e5e5e5; }
   .badge-inst { display: inline-flex; align-items: center; background: #E6F1FB; color: #0C447C; font-size: 12px; font-weight: 500; padding: 4px 14px; border-radius: 20px; margin-bottom: 12px; }
   h1 { font-size: 22px; font-weight: 500; margin-bottom: 6px; }
@@ -26,8 +38,8 @@
   .hints { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
   .hint { font-size: 11px; padding: 3px 10px; border: 0.5px solid #e5e5e5; border-radius: 20px; cursor: pointer; color: #666; background: #fafafa; user-select: none; }
   .hint:hover { background: #f0f0f0; }
-  button { width: 100%; padding: 11px; font-size: 14px; font-weight: 500; border-radius: 8px; border: none; background: #185FA5; color: #fff; cursor: pointer; transition: opacity .15s; }
-  button:disabled { background: #aaa; cursor: not-allowed; }
+  button.analisar { width: 100%; padding: 11px; font-size: 14px; font-weight: 500; border-radius: 8px; border: none; background: #185FA5; color: #fff; cursor: pointer; }
+  button.analisar:disabled { background: #aaa; cursor: not-allowed; }
 
   .erro { background: #FCEBEB; border: 0.5px solid #F09595; border-radius: 12px; padding: 14px 18px; margin-bottom: 1rem; font-size: 14px; color: #A32D2D; }
 
@@ -50,6 +62,9 @@
   .ref-desc { font-size: 11px; color: #444; line-height: 1.5; margin-bottom: 2px; }
   .ref-lei { font-size: 10px; color: #999; }
 
+  .sair-btn { font-size: 12px; color: #888; background: none; border: 0.5px solid #e5e5e5; border-radius: 20px; padding: 3px 12px; cursor: pointer; float: right; margin-top: -2px; }
+  .sair-btn:hover { color: #A32D2D; border-color: #F09595; }
+
   @media (max-width: 600px) {
     .grid4 { grid-template-columns: repeat(2, 1fr); }
     .grid3 { grid-template-columns: repeat(2, 1fr); }
@@ -57,9 +72,25 @@
 </style>
 </head>
 <body>
+
+<!-- TELA DE LOGIN -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-badge">PFUFPB — Procuradoria Federal da UFPB</div>
+    <div class="login-title">Triagem Licitatória</div>
+    <div class="login-sub">Sistema de uso interno. Digite a senha para acessar.</div>
+    <input id="senha-input" class="login-input" type="password" placeholder="••••••••••" maxlength="30" />
+    <button class="login-btn" onclick="entrar()">Entrar</button>
+    <div id="login-erro" class="login-erro">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- TELA PRINCIPAL -->
+<div id="app-screen" style="display:none">
 <div class="wrap">
 
   <div class="header">
+    <button class="sair-btn" onclick="sair()">Sair</button>
     <div class="badge-inst">PFUFPB — Procuradoria Federal da UFPB</div>
     <h1>Assistente de Triagem Licitatória</h1>
     <p class="subtitle">Descreva o processo e receba o encaminhamento correto com base nas regras vigentes.</p>
@@ -95,7 +126,7 @@
     </div>
     <textarea id="texto" placeholder="Descreva o processo: objeto, modalidade, lei aplicável (8.666/93 ou 14.133/2021), valor estimado, situação do contrato, se há alteração contratual simultânea..."></textarea>
     <div class="hints" id="hints"></div>
-    <button id="btn" onclick="analisar()">Analisar processo</button>
+    <button class="analisar" id="btn" onclick="analisar()">Analisar processo</button>
   </div>
 
   <div id="erro" class="erro" style="display:none"></div>
@@ -104,6 +135,7 @@
   <div class="refs-title">Pareceres referenciais vigentes — 2025</div>
   <div class="grid3" id="refs"></div>
 
+</div>
 </div>
 
 <script>
@@ -125,6 +157,29 @@ const CFG = {
   green: { bg:"#EAF3DE", badgeBg:"#C0DD97", badgeText:"#173404", titleColor:"#173404", subColor:"#3B6D11", border:"#639922" },
   grey:  { bg:"#F1EFE8", badgeBg:"#D3D1C7", badgeText:"#2C2C2A", titleColor:"#2C2C2A", subColor:"#5F5E5A", border:"#B4B2A9" },
 };
+
+// Senha em sessão
+let senhaAtual = "";
+
+function entrar() {
+  const s = document.getElementById("senha-input").value;
+  if (!s) return;
+  senhaAtual = s;
+  document.getElementById("login-erro").style.display = "none";
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("app-screen").style.display = "block";
+}
+
+function sair() {
+  senhaAtual = "";
+  document.getElementById("senha-input").value = "";
+  document.getElementById("app-screen").style.display = "none";
+  document.getElementById("login-screen").style.display = "block";
+}
+
+document.getElementById("senha-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") entrar();
+});
 
 // Hints
 const hintsEl = document.getElementById("hints");
@@ -157,9 +212,14 @@ async function analisar() {
     const res = await fetch("/api/triar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ texto })
+      body: JSON.stringify({ texto, senha: senhaAtual })
     });
     const data = await res.json();
+    if (res.status === 401) {
+      sair();
+      document.getElementById("login-erro").style.display = "block";
+      return;
+    }
     if (data.error) throw new Error(data.error);
     mostrarResultado(data);
   } catch (e) {
